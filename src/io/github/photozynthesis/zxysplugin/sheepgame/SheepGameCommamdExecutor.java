@@ -12,7 +12,7 @@ public class SheepGameCommamdExecutor implements CommandExecutor {
 	private ZXYsPlugin plugin;
 	private SheepGameListener sheepGameListener;
 	private SheepGameBroadcastListener broadcastListener;
-	// 指示监听器是否已注册
+	// signs whether the listener is registered
 	private boolean flag = false;
 
 	public SheepGameCommamdExecutor(ZXYsPlugin plugin) {

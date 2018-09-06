@@ -13,6 +13,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import io.github.photozynthesis.zxysplugin.ZXYsPlugin;
@@ -21,11 +23,11 @@ public class SheepGameListener implements Listener {
 
 	private ZXYsPlugin plugin;
 	private Random r = new Random();
-	private HashSet<Sheep> exploding;
+	private HashSet<Sheep> exploding = new HashSet<Sheep>();
 	// §
-	private String[] formats = {"§0", "§1", "§2", "§3", "§4", "§5", "§6", "§7", "§8", "§9", "§a", "§b", "§c", "§d", "§e"};
-	private int formatPointer = 14;
-	
+	private String[] formats = {"§2", "§3", "§5", "§6", "§9", "§a", "§b", "§c", "§d", "§e"};
+	private int formatPointer = formats.length - 1;
+
 	public HandlerList handlerList = PlayerInteractAtEntityEvent.getHandlerList();
 
 	public SheepGameListener(ZXYsPlugin plugin) {
@@ -42,7 +44,7 @@ public class SheepGameListener implements Listener {
 			return;
 		}
 		// Only runs for main hand
-		if(ev.getHand() != EquipmentSlot.HAND) {
+		if (ev.getHand() != EquipmentSlot.HAND) {
 			return;
 		}
 		// Only runs for sheeps
@@ -51,51 +53,70 @@ public class SheepGameListener implements Listener {
 		}
 		final Sheep sheep = (Sheep) en;
 		// Only runs when the sheep is not exploding
-		if(exploding.contains(sheep)) {
+		if (exploding.contains(sheep)) {
 			return;
 		}
-		int explode = r.nextInt(5);
+		int explode = r.nextInt(10);
 		if (explode == 1) {
 			exploding.add(sheep);
 			String format = nextFormat();
-			player.sendMessage("[sheep] " + format + "我猪肉佬...");
-			sheep.setColor(DyeColor.WHITE);
+			player.sendMessage(new StringBuilder("[sheep] ").append(format).append("我猪肉佬...").toString());
+			sheep.setColor(DyeColor.YELLOW);
 			new BukkitRunnable() {
 				Sheep s = sheep;
 				Player p = player;
 				String f = format;
+				HashSet<Sheep> set = exploding;
 				@Override
 				public void run() {
-					p.sendMessage("[sheep] " + f + "何尝不想成为一个伟大的舞蹈家？");
-					s.setColor(DyeColor.YELLOW);
+					if (s.getHealth() == 0 || s.isDead()) {
+						set.remove(s);
+						return;
+					}
+					s.setColor(DyeColor.RED);
+					p.sendMessage(new StringBuilder("[sheep] ").append(f).append("何尝不想成为一个伟大的舞蹈家？").toString());
 				}
 			}.runTaskLater(plugin, 10);
 			new BukkitRunnable() {
 				Sheep s = sheep;
 				Player p = player;
 				String f = format;
+				HashSet<Sheep> set = exploding;
 				@Override
 				public void run() {
-					p.sendMessage("[sheep] " + f + "在这个Moment...");
-					s.setColor(DyeColor.RED);
+					if (s.getHealth() == 0 || s.isDead()) {
+						set.remove(s);
+						return;
+					}
+					s.setColor(DyeColor.BLACK);
+					p.sendMessage(new StringBuilder("[sheep] ").append(f).append("在这个Moment...").toString());
 				}
 			}.runTaskLater(plugin, 30);
 			new BukkitRunnable() {
 				Sheep s = sheep;
 				Player p = player;
 				String f = format;
+				HashSet<Sheep> set = exploding;
 				@Override
 				public void run() {
-					p.sendMessage("[sheep] " + f + "要爆了！");
-					s.setColor(DyeColor.BLACK);
+					if (s.getHealth() == 0 || s.isDead()) {
+						set.remove(s);
+						return;
+					}
+					s.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 150, 1));
+					p.sendMessage(new StringBuilder("[sheep] ").append(f).append("要爆了！").toString());
 				}
 			}.runTaskLater(plugin, 60);
 			new BukkitRunnable() {
-				HashSet<Sheep> set = exploding;
 				Sheep s = sheep;
+				HashSet<Sheep> set = exploding;
 				@Override
 				public void run() {
-					s.getWorld().createExplosion(s.getLocation(), 5.0F);
+					if (s.getHealth() == 0 || s.isDead()) {
+						set.remove(s);
+						return;
+					}
+					s.getWorld().createExplosion(s.getLocation(), 3.0F);
 					set.remove(s);
 				}
 			}.runTaskLater(plugin, 100);
@@ -104,12 +125,12 @@ public class SheepGameListener implements Listener {
 		player.sendMessage("[Sheep] 咩~");
 		return;
 	}
-	
+
 	public String nextFormat() {
-		if((formatPointer + 1) == formats.length) {
+		if ((formatPointer + 1) == formats.length) {
 			formatPointer = 0;
 		} else {
-			formatPointer ++;
+			formatPointer++;
 		}
 		return formats[formatPointer];
 	}

@@ -17,6 +17,7 @@ public class ZXYsPlugin extends JavaPlugin{
 		this.getCommand("sheepgame").setExecutor(sheepGameCommandExecutor);
 		
 		// enabling ChunkTrace
+		// not completed
 		
 	}
 	

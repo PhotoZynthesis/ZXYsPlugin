@@ -7,17 +7,17 @@ commands:
   description: Sheeps have individual moods!
   aliases: sheep
   permission: zxy.sheepgame
-  permission-message: "no permission !"
-  usage: "[/sheepgame start/stop] or [/sheep start/stop]"
+  permission-message: "§cOnly ops can start or stop the SheepGame !"
+  usage: "Use §a/sheepgame (start/stop)§r or §a/sheep (start/stop)§r !"
  chunktrace:
   description: Util for tracing chunks!
   aliases: chunk
   permission: zxy.chunktrace
   permission-message: "no permission !"
-  usage: "[/chunktrace register/show] or [/chunk register/show]"
+  usage: "§c/chunktrace (register/show)§r or §c/chunk (register/show)"
 
 permissions:
  zxy.sheepgame:
-  default: true
+  default: op
  zxy.chunktrace:
   default: true

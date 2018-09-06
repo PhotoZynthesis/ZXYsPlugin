@@ -11,8 +11,8 @@ public class SheepGameBroadcastListener implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent ev) {
 		Player p = ev.getPlayer();
 		if (p != null) {
-			p.sendMessage("[SheepGame] 插件已启用！");
-			p.sendMessage("[SheepGame] 使用 /sheepgame 或 /sheep 来查看用法并开始游戏！");
+			p.sendMessage("[ZXYsPlugin] §a新功能 [SheepGame] 已安装！");
+			p.sendMessage("[ZXYsPlugin] §a使用 /sheepgame 或 /sheep 来查看用法并开始游戏！");
 		}
 		return;
 	}

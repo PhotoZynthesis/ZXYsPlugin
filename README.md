@@ -12,8 +12,24 @@ The plugin mainly contains some ~~useless~~ funny functions.
 
 Maybe some utils ?
 
-## 3. Logs
+## 3. Completed Functions
+
+1. **SheepGame**
+
+   - Sheeps have individual moods !
+
+   - Sheeps would randomly explode when tapped !
+   - Only ops can start or stop the SheepGame.
+   - For more usage, log in the game and check out the notifications.
+
+## 4. Logs
 
 - 2018.9.6
 
-  Working on sheepgame.
+  Working on SheepGame.
+
+- 2018.9.6
+
+  Fixing bugs.
+
+  SheepGame almost completed !
