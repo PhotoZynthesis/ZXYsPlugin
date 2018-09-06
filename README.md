@@ -11,3 +11,9 @@ For learning Bukkit Programming & improving ability of English JavaDoc Reading.
 The plugin mainly contains some ~~useless~~ funny functions.
 
 Maybe some utils ?
+
+## 3. Logs
+
+- 2018.9.6
+
+  Working on sheepgame.
