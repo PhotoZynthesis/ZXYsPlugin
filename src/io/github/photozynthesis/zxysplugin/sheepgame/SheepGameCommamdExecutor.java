@@ -11,6 +11,7 @@ public class SheepGameCommamdExecutor implements CommandExecutor {
 
 	private ZXYsPlugin plugin;
 	private SheepGameListener sheepGameListener;
+	private SheepGameBroadcastListener broadcastListener;
 	// 指示监听器是否已注册
 	private boolean flag = false;
 
@@ -18,6 +19,8 @@ public class SheepGameCommamdExecutor implements CommandExecutor {
 		super();
 		this.plugin = plugin;
 		sheepGameListener = new SheepGameListener(plugin);
+		broadcastListener = new SheepGameBroadcastListener();
+		plugin.getServer().getPluginManager().registerEvents(broadcastListener, plugin);
 	}
 
 	@Override
