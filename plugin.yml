@@ -1,0 +1,23 @@
+name: ZXYsPlugin
+main: io.github.photozynthesis.zxysplugin.ZXYsPlugin
+version: 0.1
+
+commands:
+ sheepgame:
+  description: Sheeps have individual moods!
+  aliases: sheep
+  permission: zxy.sheepgame
+  permission-message: "no permission !"
+  usage: "[/sheepgame start/stop] or [/sheep start/stop]"
+ chunktrace:
+  description: Util for tracing chunks!
+  aliases: chunk
+  permission: zxy.chunktrace
+  permission-message: "no permission !"
+  usage: "[/chunktrace register/show] or [/chunk register/show]"
+
+permissions:
+ zxy.sheepgame:
+  default: true
+ zxy.chunktrace:
+  default: true
