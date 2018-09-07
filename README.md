@@ -39,3 +39,9 @@ Maybe some utils ?
   Working on ChunkTool.
 
   Scheduled function :  shows the status of chunk loading in a registered area.
+
+- 2018.9.7
+
+  The function mentioned above is almost completed.
+
+  Still needs some optimization.

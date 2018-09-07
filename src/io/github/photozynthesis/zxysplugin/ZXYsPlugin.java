@@ -18,7 +18,7 @@ public class ZXYsPlugin extends JavaPlugin{
 		this.getCommand("sheepgame").setExecutor(sheepGameCommandExecutor);
 		
 		// enabling ChunkTool
-		chunkToolCommandExecutor = new ChunkToolCommandExecutor();
+		chunkToolCommandExecutor = new ChunkToolCommandExecutor(this);
 		this.getCommand("chunktool").setExecutor(chunkToolCommandExecutor);
 	}
 	

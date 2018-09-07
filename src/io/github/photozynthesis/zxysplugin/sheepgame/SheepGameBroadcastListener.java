@@ -2,12 +2,13 @@ package io.github.photozynthesis.zxysplugin.sheepgame;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class SheepGameBroadcastListener implements Listener {
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerJoin(PlayerJoinEvent ev) {
 		Player p = ev.getPlayer();
 		if (p != null) {
