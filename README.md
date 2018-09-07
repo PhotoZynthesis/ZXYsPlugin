@@ -33,3 +33,9 @@ Maybe some utils ?
   Fixing bugs.
 
   SheepGame almost completed !
+
+- 2018.9.7
+
+  Working on ChunkTool.
+
+  Scheduled function :  shows the status of chunk loading in a registered area.
