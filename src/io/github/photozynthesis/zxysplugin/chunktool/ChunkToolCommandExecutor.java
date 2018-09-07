@@ -13,17 +13,20 @@ import io.github.photozynthesis.zxysplugin.ZXYsPlugin;
 
 public class ChunkToolCommandExecutor implements CommandExecutor {
 
-	private ZXYsPlugin plugin;
+//	private ZXYsPlugin plugin;
 	private ChunkToolBroadcastListener broadcastListener;
-	private HashMap<Player, Chunk[]> map = new HashMap<Player, Chunk[]>();
+	private HashMap<String, Chunk[]> map = new HashMap<String, Chunk[]>();
 
 	public ChunkToolCommandExecutor(ZXYsPlugin plugin) {
 		super();
-		this.plugin = plugin;
+//		this.plugin = plugin;
 		broadcastListener = new ChunkToolBroadcastListener();
 		plugin.getServer().getPluginManager().registerEvents(broadcastListener, plugin);
 	}
 
+	/**
+	 * Resolves the command and invokes specific functions.
+	 */
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// check whether the command matches
@@ -50,14 +53,29 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 			if (radius < 1 || 12 < radius) {
 				return false;
 			}
-			return registerChunk(player, radius);
+			return registerChunks(player, radius);
 		} else if ("show".equalsIgnoreCase(args[0]) && args.length == 1) {
 			return showChunkTrace(player);
+		} else if ("unregister".equalsIgnoreCase(args[0]) && args.length == 1) {
+			return unregisterChunks(player);
+		} else if ("unregisterall".equalsIgnoreCase(args[0]) && args.length == 1) {
+			if (!player.hasPermission("zxy.chunktool.unregisterall")) {
+				player.sendMessage("[ChunkTool] §cOnly ops can unregister registrations of all players !");
+				return true;
+			}
+			return unregisterAll(player);
 		}
 		return false;
 	}
 
-	public boolean registerChunk(Player player, int radius) {
+	/**
+	 * Functions as its name.
+	 * 
+	 * @param player
+	 * @param radius
+	 * @return true when finished
+	 */
+	public boolean registerChunks(Player player, int radius) {
 		// get the location of current chunk and the amount of chunks to register
 		Chunk currentChunk = player.getLocation().getChunk();
 		int currentChunkX = currentChunk.getX();
@@ -72,7 +90,7 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 			registered[count] = world.getChunkAt(x + (count % (2 * radius + 1)), z + (count / (2 * radius + 1)));
 		}
 		// add the register information to map and send the success message
-		map.put(player, registered);
+		map.put(player.getName(), registered);
 		int side = 2 * radius + 1;
 		player.sendMessage("[ChunkTool] §a成功注册以当前区块为中心的§6" + side + "x" + side + "=" + (side * side) + "§a个区块！");
 		player.sendMessage("[ChunkTool] §a在任何位置使用 §6/<chunktool/chunk> show §a来查看区块的加载情况！");
@@ -81,12 +99,18 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 		return true;
 	}
 
+	/**
+	 * Prints the loaded status of registered chunks in chat area.
+	 * 
+	 * @param player
+	 * @return true when finished
+	 */
 	public boolean showChunkTrace(Player player) {
-		if (!map.containsKey(player)) {
-			player.sendMessage("[ChunkTool] §c你还没有注册区块！");
+		if (!map.containsKey(player.getName())) {
+			player.sendMessage("[ChunkTool] §c你还没有注册过区块！");
 			return true;
 		}
-		Chunk[] registered = map.get(player);
+		Chunk[] registered = map.get(player.getName());
 		int rows = (int) Math.sqrt(registered.length);
 		// print the above lines
 		StringBuilder sb = null;
@@ -94,9 +118,9 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 			sb = new StringBuilder("");
 			for (int j = 0; j < rows; j++) {
 				if (registered[i * rows + j].isLoaded()) {
-					sb.append("§a#");
+					sb.append("§a# ");
 				} else {
-					sb.append("§0#");
+					sb.append("§0# ");
 				}
 			}
 			player.sendMessage("[ChunkTool] " + sb.toString());
@@ -106,16 +130,16 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 		for (int j = 0; j < rows; j++) {
 			if (j == rows / 2) {
 				if (registered[(rows / 2) * rows + j].isLoaded()) {
-					sb.append("§6$");
+					sb.append("§6$ ");
 				} else {
-					sb.append("§f$");
+					sb.append("§f$ ");
 				}
 				continue;
 			}
 			if (registered[(rows / 2) * rows + j].isLoaded()) {
-				sb.append("§a#");
+				sb.append("§a# ");
 			} else {
-				sb.append("§0#");
+				sb.append("§0# ");
 			}
 		}
 		player.sendMessage("[ChunkTool] " + sb.toString());
@@ -124,16 +148,45 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 			sb = new StringBuilder("");
 			for (int j = 0; j < rows; j++) {
 				if (registered[i * rows + j].isLoaded()) {
-					sb.append("§a#");
+					sb.append("§a# ");
 				} else {
-					sb.append("§0#");
+					sb.append("§0# ");
 				}
 			}
 			player.sendMessage("[ChunkTool] " + sb.toString());
 		}
 		// show notifications
-		player.sendMessage("[ChunkTool] Notes: §a#§r=加载的区块  §0#§r=卸载的区块");
-		player.sendMessage("[ChunkTool] Notes: §6$§r=加载的中心区块  §f$§r=卸载的中心区块");
+		player.sendMessage("[ChunkTool] Notes: '§a#§r'=加载的区块     '§6$§r'=加载的中心区块");
+		player.sendMessage("[ChunkTool] Notes: '§0#§r'=卸载的区块     '§f$§r'=卸载的中心区块");
+		return true;
+	}
+
+	/**
+	 * Functions as its name.
+	 * 
+	 * @param player
+	 * @return true when finished
+	 */
+	public boolean unregisterChunks(Player player) {
+		if (!map.containsKey(player.getName())) {
+			player.sendMessage("[ChunkTool] §c你还没有注册过区块！");
+			return true;
+		}
+		map.put(player.getName(), null);
+		map.remove(player.getName());
+		player.sendMessage("[ChunkTool] §a已成功注销你的区块注册信息。");
+		return true;
+	}
+
+	/**
+	 * Unregisters registrations of all players.
+	 * 
+	 * @param player
+	 * @return true when finished
+	 */
+	public boolean unregisterAll(Player player) {
+		map.clear();
+		player.sendMessage("[ChunkTool] §a已成功注销所有玩家的区块注册信息。");
 		return true;
 	}
 }

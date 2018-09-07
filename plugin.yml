@@ -12,12 +12,16 @@ commands:
  chunktool:
   description: Util for tracing chunks!
   aliases: chunk
-  permission: zxy.chunktrace
+  permission: zxy.chunktool
   permission-message: "no permission !"
-  usage: "Use §a/<chunktool/chunk> register <radius>§r to register current chunk. Use §a/<chunktool/chunk> show§r to show the loadmap."
+  usage: "[ChunkTool] Use §a/<chunktool/chunk> register <radius>§r to register current chunk.\n[ChunkTool] Use §a/<chunktool/chunk> show§r to show the loadmap.\n[ChunkTool] Warning: the max radius for chunks registration is §612§r !"
+# usage: "[ChunkTool] Use §a/<chunktool/chunk> show§r to show the loadmap."
+# usage: "[ChunkTool] Warning: the max radius for chunks registration is §612§r !"
 
 permissions:
  zxy.sheepgame:
   default: op
- zxy.chunktrace:
+ zxy.chunktool:
   default: true
+ zxy.chunktool.unregisterall:
+  default: op
