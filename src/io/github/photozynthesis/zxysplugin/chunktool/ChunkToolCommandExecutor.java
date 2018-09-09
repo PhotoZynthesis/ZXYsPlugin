@@ -13,13 +13,13 @@ import io.github.photozynthesis.zxysplugin.ZXYsPlugin;
 
 public class ChunkToolCommandExecutor implements CommandExecutor {
 
-//	private ZXYsPlugin plugin;
+	// private ZXYsPlugin plugin;
 	private ChunkToolBroadcastListener broadcastListener;
 	private HashMap<String, Chunk[]> map = new HashMap<String, Chunk[]>();
 
 	public ChunkToolCommandExecutor(ZXYsPlugin plugin) {
 		super();
-//		this.plugin = plugin;
+		// this.plugin = plugin;
 		broadcastListener = new ChunkToolBroadcastListener();
 		plugin.getServer().getPluginManager().registerEvents(broadcastListener, plugin);
 	}
@@ -30,7 +30,7 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// check whether the command matches
-		if (!("chunktool".equalsIgnoreCase(label) || "chunk".equalsIgnoreCase(label))) {
+		if (!"chunktool".equalsIgnoreCase(label)) {
 			return false;
 		}
 		// check args length
@@ -43,7 +43,7 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 		}
 		Player player = (Player) sender;
 		// invoke functions for individual command
-		if ("register".equalsIgnoreCase(args[0]) && args.length == 2) {
+		if (("register".equalsIgnoreCase(args[0]) || "reg".equalsIgnoreCase(args[0])) && args.length == 2) {
 			int radius = 0;
 			try {
 				radius = Integer.valueOf(args[1]);
@@ -56,9 +56,9 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 			return registerChunks(player, radius);
 		} else if ("show".equalsIgnoreCase(args[0]) && args.length == 1) {
 			return showChunkTrace(player);
-		} else if ("unregister".equalsIgnoreCase(args[0]) && args.length == 1) {
+		} else if (("unregister".equalsIgnoreCase(args[0]) || "unreg".equalsIgnoreCase(args[0])) && args.length == 1) {
 			return unregisterChunks(player);
-		} else if ("unregisterall".equalsIgnoreCase(args[0]) && args.length == 1) {
+		} else if (("unregisterall".equalsIgnoreCase(args[0]) || "unregall".equalsIgnoreCase(args[0])) && args.length == 1) {
 			if (!player.hasPermission("zxy.chunktool.unregisterall")) {
 				player.sendMessage("[ChunkTool] §cOnly ops can unregister registrations of all players !");
 				return true;
@@ -94,7 +94,7 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 		int side = 2 * radius + 1;
 		player.sendMessage("[ChunkTool] §a成功注册以当前区块为中心的§6" + side + "x" + side + "=" + (side * side) + "§a个区块！");
 		player.sendMessage("[ChunkTool] §a在任何位置使用 §6/<chunktool/chunk> show §a来查看区块的加载情况！");
-		player.sendMessage("[ChunkTool] §a注意：区块注册信息保存在内存中，§6服务器关闭/重启后将会清除。");
+		player.sendMessage("[ChunkTool] §c注意：§a区块注册信息保存在内存中，§6服务器关闭/重启后将会清除。");
 		// return the method
 		return true;
 	}
@@ -112,10 +112,37 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 		}
 		Chunk[] registered = map.get(player.getName());
 		int rows = (int) Math.sqrt(registered.length);
-		// print the above lines
 		StringBuilder sb = null;
+		// print the top navigate line
+		sb = new StringBuilder("");
+		for (int j = 0; j < rows; j++) {
+			if (j == rows / 2) {
+				sb.append("§bN ");
+				continue;
+			}
+			if (j % 2 == 0) {
+				sb.append("§9");
+				sb.append(Integer.toHexString(Math.abs(j - rows / 2)));
+				sb.append(" ");
+			} else {
+				sb.append("§c");
+				sb.append(Integer.toHexString(Math.abs(j - rows / 2)));
+				sb.append(" ");
+			}
+		}
+		player.sendMessage("[ChunkTool] §d$ " + sb.toString());
+		// print the above lines
 		for (int i = 0; i < rows / 2; i++) {
 			sb = new StringBuilder("");
+			if (i % 2 == 0) {
+				sb.append("§9");
+				sb.append(Integer.toHexString(rows / 2 - i));
+				sb.append(" ");
+			} else {
+				sb.append("§c");
+				sb.append(Integer.toHexString(rows / 2 - i));
+				sb.append(" ");
+			}
 			for (int j = 0; j < rows; j++) {
 				if (registered[i * rows + j].isLoaded()) {
 					sb.append("§a# ");
@@ -127,6 +154,7 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 		}
 		// print the middle line
 		sb = new StringBuilder("");
+		sb.append("§bW ");
 		for (int j = 0; j < rows; j++) {
 			if (j == rows / 2) {
 				if (registered[(rows / 2) * rows + j].isLoaded()) {
@@ -146,6 +174,15 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 		// print the bottom lines
 		for (int i = rows / 2 + 1; i < rows; i++) {
 			sb = new StringBuilder("");
+			if (i % 2 == 0) {
+				sb.append("§9");
+				sb.append(Integer.toHexString(i - rows / 2));
+				sb.append(" ");
+			} else {
+				sb.append("§c");
+				sb.append(Integer.toHexString(i - rows / 2));
+				sb.append(" ");
+			}
 			for (int j = 0; j < rows; j++) {
 				if (registered[i * rows + j].isLoaded()) {
 					sb.append("§a# ");

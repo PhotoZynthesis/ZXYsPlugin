@@ -1,6 +1,6 @@
 name: ZXYsPlugin
 main: io.github.photozynthesis.zxysplugin.ZXYsPlugin
-version: 0.1
+version: 1.0
 
 commands:
  sheepgame:
@@ -14,9 +14,12 @@ commands:
   aliases: chunk
   permission: zxy.chunktool
   permission-message: "no permission !"
-  usage: "[ChunkTool] Use §a/<chunktool/chunk> register <radius>§r to register current chunk.\n[ChunkTool] Use §a/<chunktool/chunk> show§r to show the loadmap.\n[ChunkTool] Warning: the max radius for chunks registration is §612§r !"
-# usage: "[ChunkTool] Use §a/<chunktool/chunk> show§r to show the loadmap."
-# usage: "[ChunkTool] Warning: the max radius for chunks registration is §612§r !"
+  usage: "[ChunkTool] Use §a/chunktool <register|reg> <radius...>§r to register current chunk.\n[ChunkTool] Use §a/chunktool show§r to show the loadmap.\n[ChunkTool] Use §a/chunktool <unregister|unreg>§r to unregister your registered chunks.\n[ChunkTool] §6OP§r: Use §a/chunktool <unregisterall|unregall>§r to unregister registrations of all players.\n[ChunkTool] §cWarning§r: the §6max radius§r for chunks registration is §612§r !"
+# usage: "[ChunkTool] Use §a/chunktool <register|reg> <radius...>§r to register current chunk."
+# usage: "[ChunkTool] Use §a/chunktool show§r to show the loadmap."
+# usage: "[ChunkTool] Use §a/chunktool <unregister|unreg>§r to unregister your registered chunks."
+# usage: "[ChunkTool] §6OP§r: Use §a/chunktool <unregisterall|unregall>§r to unregister registrations of all players."
+# usage: "[ChunkTool] §cWarning§r: the §6max radius§r for chunks registration is §612§r !"
 
 permissions:
  zxy.sheepgame:
