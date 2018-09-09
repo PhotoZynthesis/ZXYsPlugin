@@ -75,19 +75,26 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 			}
 			return unregisterAll(player);
 			// showregs
-		} else if ("showregs".equalsIgnoreCase(args[0]) || args.length == 1) {
+		} else if ("showregs".equalsIgnoreCase(args[0]) && args.length == 1) {
 			if (!player.hasPermission("zxy.chunktool.op")) {
 				player.sendMessage("[ChunkTool] §c只有OP可以查看所有玩家的区块注册 !");
 				return true;
 			}
 			return showRegs(player);
 			// showRegOfOthers
-		} else if ("show".equalsIgnoreCase(args[0]) || args.length == 2) {
+		} else if ("show".equalsIgnoreCase(args[0]) && args.length == 2) {
 			if (!player.hasPermission("zxy.chunktool.op")) {
 				player.sendMessage("[ChunkTool] §c只有OP可以查看其他玩家注册区块的加载情况 !");
 				return true;
 			}
 			return showRegOfOthers(player, args[1]);
+			// unregOthers
+		} else if (("unregister".equalsIgnoreCase(args[0]) || "unreg".equalsIgnoreCase(args[0])) && args.length == 2) {
+			if (!player.hasPermission("zxy.chunktool.op")) {
+				player.sendMessage("[ChunkTool] §c只有OP可以清除其他玩家的区块注册 !");
+				return true;
+			}
+			return unregOthers(player, args[1]);
 		}
 		return false;
 	}
@@ -116,6 +123,7 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 		// add the register information to map and send the success message
 		map.put(player.getName(), registered);
 		int side = 2 * radius + 1;
+		player.sendMessage(" ");
 		player.sendMessage("[ChunkTool] §a成功注册以当前区块为中心的§6" + side + "x" + side + "=" + (side * side) + "§a个区块！");
 		player.sendMessage("[ChunkTool] §a在任何位置使用 §6/<chunktool/chunk> show §a来查看区块的加载情况！");
 		player.sendMessage("[ChunkTool] §c注意：§a区块注册信息保存在内存中，§6服务器关闭/重启后将会清除。");
@@ -126,8 +134,8 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 	/**
 	 * Prints the loaded status of registered chunks in chat area.
 	 * 
-	 * @param player -> player to send message to
-	 * @param name -> name to query
+	 * @param player : player to send message to
+	 * @param name : name to query
 	 * @return true when finished
 	 */
 	public boolean showChunkTrace(Player player, String name) {
@@ -219,7 +227,8 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 		}
 		// show notifications
 		Location firstChunkLocation = registered[0].getBlock(0, 0, 0).getLocation();
-		Location lastChunkLocation = registered[registered.length - 1].getBlock(15, 0, 15).getLocation();
+		Chunk temp = player.getWorld().getChunkAt(registered[registered.length - 1].getX() + 1, registered[registered.length - 1].getZ() + 1);
+		Location lastChunkLocation = temp.getBlock(0, 0, 0).getLocation();
 		player.sendMessage("[ChunkTool] Notes: '§a#§r'=加载的区块     '§6$§r'=加载的中心区块");
 		player.sendMessage("[ChunkTool] Notes: '§0#§r'=卸载的区块     '§f$§r'=卸载的中心区块");
 		player.sendMessage("[ChunkTool] Range: §6(" + firstChunkLocation.getX() + ", " + firstChunkLocation.getZ()
@@ -265,7 +274,7 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 	public boolean showRegs(Player player) {
 		Set<String> names = map.keySet();
 		if (names.isEmpty()) {
-			player.sendMessage("[ChunkTool] §6当前没有人注册了区块！");
+			player.sendMessage("[ChunkTool] §6当前没有任何玩家注册了区块！");
 			return true;
 		}
 		StringBuilder sb = new StringBuilder("");
@@ -285,16 +294,35 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 	/**
 	 * OP : Show another player's registered chunks' trace.
 	 * 
-	 * @param player -> player to send message to
-	 * @param name -> name to query
-	 * @return
+	 * @param player : player to send message to
+	 * @param name : name to query
+	 * @return true when finished
 	 */
 	public boolean showRegOfOthers(Player player, String name) {
 		if (!map.containsKey(name)) {
-			player.sendMessage("[ChunkTool] §a" + name + "§c没有注册区块！");
+			player.sendMessage("[ChunkTool] §a" + name + "§c 没有注册区块！");
 			return true;
 		}
-		player.sendMessage("[ChunkTool] §6=== §a" + name + "§6注册的区块的加载情况 ===");
+		player.sendMessage(" ");
+		player.sendMessage("[ChunkTool] §6=== §a" + name + "§6 注册的区块的加载情况 ===");
 		return showChunkTrace(player, name);
+	}
+	
+	/**
+	 * OP : Unregister another player's registered chunks.
+	 * 
+	 * @param player : player to send message to
+	 * @param name : name to query
+	 * @return true when finished
+	 */
+	public boolean unregOthers(Player player, String name) {
+		if (!map.containsKey(name)) {
+			player.sendMessage("[ChunkTool] §a" + name + "§c 没有注册区块！");
+			return true;
+		}
+		map.put(name, null);
+		map.remove(name);
+		player.sendMessage("[ChunkTool] §6成功清除玩家 §a" + name + " §6的区块注册！");
+		return true;
 	}
 }

@@ -17,9 +17,12 @@ Maybe some utils ?
 1. **SheepGame**
 
    - Sheeps have individual moods !
-
    - Sheeps would randomly explode when tapped !
    - Only ops can start or stop the SheepGame.
+   - For more usage, log in the game and check out the notifications.
+2. **ChunkTool**
+   - Register chunks in a certain area (with radius) and show whether they are loaded.
+   - Ranges from `1 x 1 = 1` to `25 x 25 = 625` chunks.
    - For more usage, log in the game and check out the notifications.
 
 ## 4. Logs
@@ -45,3 +48,7 @@ Maybe some utils ?
   The function mentioned above is almost completed.
 
   Still needs some optimization.
+
+- 2018.9.9
+
+  ChunkTool almost completed !
