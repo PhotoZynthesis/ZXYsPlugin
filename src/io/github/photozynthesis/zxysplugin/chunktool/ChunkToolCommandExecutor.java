@@ -1,8 +1,10 @@
 package io.github.photozynthesis.zxysplugin.chunktool;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,6 +18,7 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 	// private ZXYsPlugin plugin;
 	private ChunkToolBroadcastListener broadcastListener;
 	private HashMap<String, Chunk[]> map = new HashMap<String, Chunk[]>();
+	int regCount;
 
 	public ChunkToolCommandExecutor(ZXYsPlugin plugin) {
 		super();
@@ -43,27 +46,48 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 		}
 		Player player = (Player) sender;
 		// invoke functions for individual command
+		// reg
 		if (("register".equalsIgnoreCase(args[0]) || "reg".equalsIgnoreCase(args[0])) && args.length == 2) {
 			int radius = 0;
 			try {
 				radius = Integer.valueOf(args[1]);
 			} catch (NumberFormatException e) {
-				return false;
+				player.sendMessage("[ChunkTool] §c请输入有效的半径§a（0 - 12）§c！");
+				return true;
 			}
-			if (radius < 1 || 12 < radius) {
-				return false;
+			if (radius < 0 || 12 < radius) {
+				player.sendMessage("[ChunkTool] §c请输入有效的半径§a（0 - 12）§c！");
+				return true;
 			}
 			return registerChunks(player, radius);
+			// show
 		} else if ("show".equalsIgnoreCase(args[0]) && args.length == 1) {
-			return showChunkTrace(player);
+			return showChunkTrace(player, player.getName());
+			// unreg
 		} else if (("unregister".equalsIgnoreCase(args[0]) || "unreg".equalsIgnoreCase(args[0])) && args.length == 1) {
 			return unregisterChunks(player);
-		} else if (("unregisterall".equalsIgnoreCase(args[0]) || "unregall".equalsIgnoreCase(args[0])) && args.length == 1) {
-			if (!player.hasPermission("zxy.chunktool.unregisterall")) {
-				player.sendMessage("[ChunkTool] §cOnly ops can unregister registrations of all players !");
+			// unregall
+		} else if (("unregisterall".equalsIgnoreCase(args[0]) || "unregall".equalsIgnoreCase(args[0]))
+				&& args.length == 1) {
+			if (!player.hasPermission("zxy.chunktool.op")) {
+				player.sendMessage("[ChunkTool] §c只有OP可以清除所有玩家的区块注册 !");
 				return true;
 			}
 			return unregisterAll(player);
+			// showregs
+		} else if ("showregs".equalsIgnoreCase(args[0]) || args.length == 1) {
+			if (!player.hasPermission("zxy.chunktool.op")) {
+				player.sendMessage("[ChunkTool] §c只有OP可以查看所有玩家的区块注册 !");
+				return true;
+			}
+			return showRegs(player);
+			// showRegOfOthers
+		} else if ("show".equalsIgnoreCase(args[0]) || args.length == 2) {
+			if (!player.hasPermission("zxy.chunktool.op")) {
+				player.sendMessage("[ChunkTool] §c只有OP可以查看其他玩家注册区块的加载情况 !");
+				return true;
+			}
+			return showRegOfOthers(player, args[1]);
 		}
 		return false;
 	}
@@ -102,15 +126,16 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 	/**
 	 * Prints the loaded status of registered chunks in chat area.
 	 * 
-	 * @param player
+	 * @param player -> player to send message to
+	 * @param name -> name to query
 	 * @return true when finished
 	 */
-	public boolean showChunkTrace(Player player) {
-		if (!map.containsKey(player.getName())) {
+	public boolean showChunkTrace(Player player, String name) {
+		if (!map.containsKey(name)) {
 			player.sendMessage("[ChunkTool] §c你还没有注册过区块！");
 			return true;
 		}
-		Chunk[] registered = map.get(player.getName());
+		Chunk[] registered = map.get(name);
 		int rows = (int) Math.sqrt(registered.length);
 		StringBuilder sb = null;
 		// print the top navigate line
@@ -131,7 +156,7 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 			}
 		}
 		player.sendMessage("[ChunkTool] §d$ " + sb.toString());
-		// print the above lines
+		// print the above lines (with the left navigate line)
 		for (int i = 0; i < rows / 2; i++) {
 			sb = new StringBuilder("");
 			if (i % 2 == 0) {
@@ -152,7 +177,7 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 			}
 			player.sendMessage("[ChunkTool] " + sb.toString());
 		}
-		// print the middle line
+		// print the middle line (with the left navigate line)
 		sb = new StringBuilder("");
 		sb.append("§bW ");
 		for (int j = 0; j < rows; j++) {
@@ -171,7 +196,7 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 			}
 		}
 		player.sendMessage("[ChunkTool] " + sb.toString());
-		// print the bottom lines
+		// print the bottom lines (with the left navigate line)
 		for (int i = rows / 2 + 1; i < rows; i++) {
 			sb = new StringBuilder("");
 			if (i % 2 == 0) {
@@ -193,8 +218,12 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 			player.sendMessage("[ChunkTool] " + sb.toString());
 		}
 		// show notifications
+		Location firstChunkLocation = registered[0].getBlock(0, 0, 0).getLocation();
+		Location lastChunkLocation = registered[registered.length - 1].getBlock(15, 0, 15).getLocation();
 		player.sendMessage("[ChunkTool] Notes: '§a#§r'=加载的区块     '§6$§r'=加载的中心区块");
 		player.sendMessage("[ChunkTool] Notes: '§0#§r'=卸载的区块     '§f$§r'=卸载的中心区块");
+		player.sendMessage("[ChunkTool] Range: §6(" + firstChunkLocation.getX() + ", " + firstChunkLocation.getZ()
+				+ ")§r -> §6(" + lastChunkLocation.getX() + ", " + lastChunkLocation.getZ() + ")");
 		return true;
 	}
 
@@ -216,14 +245,56 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 	}
 
 	/**
-	 * Unregisters registrations of all players.
+	 * OP : Unregisters registrations of all players.
 	 * 
 	 * @param player
 	 * @return true when finished
 	 */
 	public boolean unregisterAll(Player player) {
 		map.clear();
-		player.sendMessage("[ChunkTool] §a已成功注销所有玩家的区块注册信息。");
+		player.sendMessage("[ChunkTool] §6已§a成功§6注销所有玩家的区块注册信息。");
 		return true;
+	}
+
+	/**
+	 * OP : Show the players' names whom had registered chunks.
+	 * 
+	 * @param player
+	 * @return true when finished
+	 */
+	public boolean showRegs(Player player) {
+		Set<String> names = map.keySet();
+		if (names.isEmpty()) {
+			player.sendMessage("[ChunkTool] §6当前没有人注册了区块！");
+			return true;
+		}
+		StringBuilder sb = new StringBuilder("");
+		regCount = 0;
+		names.stream().forEach(s -> {
+			if (regCount == map.size() - 1) {
+				sb.append("§a").append(s);
+			} else {
+				sb.append("§a").append(s).append("§6").append(", ");
+				regCount++;
+			}
+		});
+		player.sendMessage("[ChunkTool] §6当前注册了区块的玩家有： " + sb.toString());
+		return true;
+	}
+	
+	/**
+	 * OP : Show another player's registered chunks' trace.
+	 * 
+	 * @param player -> player to send message to
+	 * @param name -> name to query
+	 * @return
+	 */
+	public boolean showRegOfOthers(Player player, String name) {
+		if (!map.containsKey(name)) {
+			player.sendMessage("[ChunkTool] §a" + name + "§c没有注册区块！");
+			return true;
+		}
+		player.sendMessage("[ChunkTool] §6=== §a" + name + "§6注册的区块的加载情况 ===");
+		return showChunkTrace(player, name);
 	}
 }

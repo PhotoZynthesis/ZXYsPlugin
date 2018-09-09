@@ -8,17 +8,19 @@ commands:
   aliases: sheep
   permission: zxy.sheepgame
   permission-message: "§cOnly ops can start or stop the SheepGame !"
-  usage: "Use §a/sheepgame <start/stop>§r or §a/sheep <start/stop>§r !"
+  usage: "[SheepGame] 使用 §a/<sheepgame|sheep> <start|stop>§r 来让羊羊君爆炸 !\n[SheepGame] 启用后，可用§a右键§r调戏羊羊君!\n[SheepGame] 爆炸几率为 §c1/10§r ，爆炸前会进行提示。"
  chunktool:
   description: Util for tracing chunks!
   aliases: chunk
   permission: zxy.chunktool
   permission-message: "no permission !"
-  usage: "[ChunkTool] Use §a/chunktool <register|reg> <radius...>§r to register current chunk.\n[ChunkTool] Use §a/chunktool show§r to show the loadmap.\n[ChunkTool] Use §a/chunktool <unregister|unreg>§r to unregister your registered chunks.\n[ChunkTool] §6OP§r: Use §a/chunktool <unregisterall|unregall>§r to unregister registrations of all players.\n[ChunkTool] §cWarning§r: the §6max radius§r for chunks registration is §612§r !"
+  usage: "[ChunkTool] 使用 §a/chunktool <register|reg> <radius...>§r 来注册区块。\n[ChunkTool] 使用 §a/chunktool show§r 来查看注册区块的加载情况。\n[ChunkTool] 使用 §a/chunktool <unregister|unreg>§r 来清除你的区块注册。\n[ChunkTool] §6OP: 使用 §a/chunktool showregs§6 来查看注册了区块的玩家。§f\n[ChunkTool] §6OP: 使用 §a/chunktool show <playername...>§6 来查看其他玩家注册区块的加载情况。§f\n[ChunkTool] §6OP: 使用 §a/chunktool <unregisterall|unregall>§6 来清除所有人的区块注册。§f\n[ChunkTool] §c警告: 目前最大的区块注册半径为 §a12§c !"
 # usage: "[ChunkTool] Use §a/chunktool <register|reg> <radius...>§r to register current chunk."
 # usage: "[ChunkTool] Use §a/chunktool show§r to show the loadmap."
 # usage: "[ChunkTool] Use §a/chunktool <unregister|unreg>§r to unregister your registered chunks."
-# usage: "[ChunkTool] §6OP§r: Use §a/chunktool <unregisterall|unregall>§r to unregister registrations of all players."
+# usage: "[ChunkTool] §6OP: 使用 §a/chunktool showregs§6 来查看注册了区块的玩家。§f"
+# usage: "[ChunkTool] §6OP: 使用 §a/chunktool show <playername...>§6 来查看其他玩家注册区块的加载情况。§f"
+# usage: "[ChunkTool] §6OP: Use §a/chunktool <unregisterall|unregall>§6 to unregister registrations of all players.§f"
 # usage: "[ChunkTool] §cWarning§r: the §6max radius§r for chunks registration is §612§r !"
 
 permissions:
@@ -26,5 +28,5 @@ permissions:
   default: op
  zxy.chunktool:
   default: true
- zxy.chunktool.unregisterall:
+ zxy.chunktool.op:
   default: op

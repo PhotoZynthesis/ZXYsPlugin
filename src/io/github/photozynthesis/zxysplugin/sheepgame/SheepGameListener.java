@@ -56,8 +56,8 @@ public class SheepGameListener implements Listener {
 		if (exploding.contains(sheep)) {
 			return;
 		}
-		int explode = r.nextInt(10);
-		if (explode == 1) {
+		int explode = r.nextInt(1000);
+		if ((explode + 1) % 10 == 1) {
 			exploding.add(sheep);
 			String format = nextFormat();
 			player.sendMessage(new StringBuilder("[sheep] ").append(format).append("我猪肉佬...").toString());
