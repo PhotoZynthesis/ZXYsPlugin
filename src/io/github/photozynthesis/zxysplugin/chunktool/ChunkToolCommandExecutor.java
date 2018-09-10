@@ -48,52 +48,25 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 		// invoke functions for individual command
 		// reg
 		if (("register".equalsIgnoreCase(args[0]) || "reg".equalsIgnoreCase(args[0])) && args.length == 2) {
-			int radius = 0;
-			try {
-				radius = Integer.valueOf(args[1]);
-			} catch (NumberFormatException e) {
-				player.sendMessage("[ChunkTool] §c请输入有效的半径§a（0 - 12）§c！");
-				return true;
-			}
-			if (radius < 0 || 12 < radius) {
-				player.sendMessage("[ChunkTool] §c请输入有效的半径§a（0 - 12）§c！");
-				return true;
-			}
-			return registerChunks(player, radius);
+			return registerChunks(player, args[1]);
 			// show
 		} else if ("show".equalsIgnoreCase(args[0]) && args.length == 1) {
-			return showChunkTrace(player, player.getName());
+			return showRegOfMe(player);
 			// unreg
 		} else if (("unregister".equalsIgnoreCase(args[0]) || "unreg".equalsIgnoreCase(args[0])) && args.length == 1) {
 			return unregisterChunks(player);
 			// unregall
 		} else if (("unregisterall".equalsIgnoreCase(args[0]) || "unregall".equalsIgnoreCase(args[0]))
 				&& args.length == 1) {
-			if (!player.hasPermission("zxy.chunktool.op")) {
-				player.sendMessage("[ChunkTool] §c只有OP可以清除所有玩家的区块注册 !");
-				return true;
-			}
 			return unregisterAll(player);
 			// showregs
 		} else if ("showregs".equalsIgnoreCase(args[0]) && args.length == 1) {
-			if (!player.hasPermission("zxy.chunktool.op")) {
-				player.sendMessage("[ChunkTool] §c只有OP可以查看所有玩家的区块注册 !");
-				return true;
-			}
 			return showRegs(player);
 			// showRegOfOthers
 		} else if ("show".equalsIgnoreCase(args[0]) && args.length == 2) {
-			if (!player.hasPermission("zxy.chunktool.op")) {
-				player.sendMessage("[ChunkTool] §c只有OP可以查看其他玩家注册区块的加载情况 !");
-				return true;
-			}
 			return showRegOfOthers(player, args[1]);
 			// unregOthers
 		} else if (("unregister".equalsIgnoreCase(args[0]) || "unreg".equalsIgnoreCase(args[0])) && args.length == 2) {
-			if (!player.hasPermission("zxy.chunktool.op")) {
-				player.sendMessage("[ChunkTool] §c只有OP可以清除其他玩家的区块注册 !");
-				return true;
-			}
 			return unregOthers(player, args[1]);
 		}
 		return false;
@@ -102,11 +75,23 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 	/**
 	 * Functions as its name.
 	 * 
-	 * @param player
-	 * @param radius
+	 * @param player : player to send message to.
+	 * @param arg    : the radius String, may be incorrect.
 	 * @return true when finished
 	 */
-	public boolean registerChunks(Player player, int radius) {
+	public boolean registerChunks(Player player, String arg) {
+		// arg check
+		int radius = 0;
+		try {
+			radius = Integer.valueOf(arg);
+		} catch (NumberFormatException e) {
+			player.sendMessage("[ChunkTool] §c参数错误！ 有效半径范围：§a（0 - 12）§c！");
+			return true;
+		}
+		if (radius < 0 || 12 < radius) {
+			player.sendMessage("[ChunkTool] §c参数错误！ 有效半径范围：§a（0 - 12）§c！");
+			return true;
+		}
 		// get the location of current chunk and the amount of chunks to register
 		Chunk currentChunk = player.getLocation().getChunk();
 		int currentChunkX = currentChunk.getX();
@@ -125,7 +110,7 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 		int side = 2 * radius + 1;
 		player.sendMessage(" ");
 		player.sendMessage("[ChunkTool] §a成功注册以当前区块为中心的§6" + side + "x" + side + "=" + (side * side) + "§a个区块！");
-		player.sendMessage("[ChunkTool] §a在任何位置使用 §6/<chunktool/chunk> show §a来查看区块的加载情况！");
+		player.sendMessage("[ChunkTool] §a在任何位置使用 §6/chunktool show §a来查看区块的加载情况！");
 		player.sendMessage("[ChunkTool] §c注意：§a区块注册信息保存在内存中，§6服务器关闭/重启后将会清除。");
 		// return the method
 		return true;
@@ -135,14 +120,10 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 	 * Prints the loaded status of registered chunks in chat area.
 	 * 
 	 * @param player : player to send message to
-	 * @param name : name to query
+	 * @param name   : name to query
 	 * @return true when finished
 	 */
 	public boolean showChunkTrace(Player player, String name) {
-		if (!map.containsKey(name)) {
-			player.sendMessage("[ChunkTool] §c你还没有注册过区块！");
-			return true;
-		}
 		Chunk[] registered = map.get(name);
 		int rows = (int) Math.sqrt(registered.length);
 		StringBuilder sb = null;
@@ -227,13 +208,30 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 		}
 		// show notifications
 		Location firstChunkLocation = registered[0].getBlock(0, 0, 0).getLocation();
-		Chunk temp = player.getWorld().getChunkAt(registered[registered.length - 1].getX() + 1, registered[registered.length - 1].getZ() + 1);
+		Chunk temp = player.getWorld().getChunkAt(registered[registered.length - 1].getX() + 1,
+				registered[registered.length - 1].getZ() + 1);
 		Location lastChunkLocation = temp.getBlock(0, 0, 0).getLocation();
 		player.sendMessage("[ChunkTool] Notes: '§a#§r'=加载的区块     '§6$§r'=加载的中心区块");
 		player.sendMessage("[ChunkTool] Notes: '§0#§r'=卸载的区块     '§f$§r'=卸载的中心区块");
 		player.sendMessage("[ChunkTool] Range: §6(" + firstChunkLocation.getX() + ", " + firstChunkLocation.getZ()
 				+ ")§r -> §6(" + lastChunkLocation.getX() + ", " + lastChunkLocation.getZ() + ")");
 		return true;
+	}
+
+	/**
+	 * Functions as its name.
+	 * 
+	 * @param player : current player
+	 * @return true when finished
+	 */
+	public boolean showRegOfMe(Player player) {
+		if (!map.containsKey(player.getName())) {
+			player.sendMessage("[ChunkTool] §c你还没有注册过区块！");
+			return true;
+		}
+		player.sendMessage(" ");
+		player.sendMessage("[ChunkTool] §a=== 我注册的区块的加载情况 ===");
+		return showChunkTrace(player, player.getName());
 	}
 
 	/**
@@ -260,8 +258,12 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 	 * @return true when finished
 	 */
 	public boolean unregisterAll(Player player) {
+		if (!player.hasPermission("zxy.chunktool.op")) {
+			player.sendMessage("[ChunkTool] §c只有§aOP§c可以清除所有玩家的区块注册 !");
+			return true;
+		}
 		map.clear();
-		player.sendMessage("[ChunkTool] §6已§a成功§6注销所有玩家的区块注册信息。");
+		player.sendMessage("[ChunkTool] §6已成功注销所有玩家的区块注册信息。");
 		return true;
 	}
 
@@ -272,6 +274,10 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 	 * @return true when finished
 	 */
 	public boolean showRegs(Player player) {
+		if (!player.hasPermission("zxy.chunktool.op")) {
+			player.sendMessage("[ChunkTool] §c只有§aOP§c可以查看所有玩家的区块注册 !");
+			return true;
+		}
 		Set<String> names = map.keySet();
 		if (names.isEmpty()) {
 			player.sendMessage("[ChunkTool] §6当前没有任何玩家注册了区块！");
@@ -290,32 +296,40 @@ public class ChunkToolCommandExecutor implements CommandExecutor {
 		player.sendMessage("[ChunkTool] §6当前注册了区块的玩家有： " + sb.toString());
 		return true;
 	}
-	
+
 	/**
 	 * OP : Show another player's registered chunks' trace.
 	 * 
 	 * @param player : player to send message to
-	 * @param name : name to query
+	 * @param name   : name to query
 	 * @return true when finished
 	 */
 	public boolean showRegOfOthers(Player player, String name) {
+		if (!player.hasPermission("zxy.chunktool.op")) {
+			player.sendMessage("[ChunkTool] §c只有§aOP§c可以查看其他玩家注册区块的加载情况 !");
+			return true;
+		}
 		if (!map.containsKey(name)) {
 			player.sendMessage("[ChunkTool] §a" + name + "§c 没有注册区块！");
 			return true;
 		}
 		player.sendMessage(" ");
-		player.sendMessage("[ChunkTool] §6=== §a" + name + "§6 注册的区块的加载情况 ===");
+		player.sendMessage("[ChunkTool] §6=== §a" + name + "§6注册的区块的加载情况 ===");
 		return showChunkTrace(player, name);
 	}
-	
+
 	/**
 	 * OP : Unregister another player's registered chunks.
 	 * 
 	 * @param player : player to send message to
-	 * @param name : name to query
+	 * @param name   : name to query
 	 * @return true when finished
 	 */
 	public boolean unregOthers(Player player, String name) {
+		if (!player.hasPermission("zxy.chunktool.op")) {
+			player.sendMessage("[ChunkTool] §c只有§aOP§c可以清除其他玩家的区块注册 !");
+			return true;
+		}
 		if (!map.containsKey(name)) {
 			player.sendMessage("[ChunkTool] §a" + name + "§c 没有注册区块！");
 			return true;
