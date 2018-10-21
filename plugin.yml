@@ -1,6 +1,6 @@
 name: ZXYsPlugin
 main: io.github.photozynthesis.zxysplugin.ZXYsPlugin
-version: 1.0
+version: 1.1
 
 commands:
  sheepgame:
@@ -23,6 +23,12 @@ commands:
 # usage: "[ChunkTool] §6OP: 使用 §a/chunktool <unregister|unreg> <playerName...>§6 来清除某个特定玩家的区块注册。§f"
 # usage: "[ChunkTool] §6OP: Use §a/chunktool <unregisterall|unregall>§6 to unregister registrations of all players.§f"
 # usage: "[ChunkTool] §cWarning§r: the §6max radius§r for chunks registration is §612§r !"
+ temperature:
+  description: Show block infos related to local temperature.
+  aliases: tem
+  permission: zxy.temperature
+  permission-message: "no permission !"
+  usage: "[Temperature] 使用 §a/<temperature|tem>§r 来查看当前位置的温度和其他信息。"
 
 permissions:
  zxy.sheepgame:
@@ -31,3 +37,5 @@ permissions:
   default: true
  zxy.chunktool.op:
   default: op
+ zxy.temperature:
+  default: true

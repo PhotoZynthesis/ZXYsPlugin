@@ -14,6 +14,6 @@ public class SheepGameBroadcastListener implements Listener {
 		if (p != null) {
 			p.sendMessage("[ZXYsPlugin] §a新功能 §6[SheepGame]§a 已安装！ 使用 §6/<sheepgame|sheep>§a 来查看§6玩法§a！");
 		}
-		return;
 	}
+	
 }

@@ -18,6 +18,6 @@ public class ChunkToolBroadcastListener implements Listener {
 		if (ev != null && (p = ev.getPlayer()) != null) {
 			p.sendMessage("[ZXYsPlugin] §a新功能 §6[ChunkTool]§a 已安装！ 使用 §6/chunktool§a 来查看用法！");
 		}
-		return;
 	}
+	
 }
